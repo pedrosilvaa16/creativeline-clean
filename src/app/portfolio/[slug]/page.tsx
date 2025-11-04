@@ -13,14 +13,14 @@ type PortfolioListResponse = {
   };
 };
 
-export async function generateStaticParams() {
+eexport async function generateStaticParams() {
   const client = getClient();
 
   const { data } = await client.query<PortfolioListResponse>({
     query: GET_PORTFOLIO_LIST,
   });
 
-  const nodes = data.portfolios?.nodes ?? [];
+  const nodes = data?.portfolios?.nodes ?? [];
 
   return nodes.slice(0, 20).map((n) => ({ slug: n.slug }));
 }
