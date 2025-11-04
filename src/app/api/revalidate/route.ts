@@ -10,11 +10,9 @@ export async function POST(req: NextRequest) {
 
   // Revalida páginas genéricas
   revalidatePath("/portfolio");
-  revalidatePath("/blog");
 
   // Se quiseres tags (quando usares fetch com { next: { tags: [...] } })
   revalidateTag("portfolio");
-  revalidateTag("blog");
 
   return NextResponse.json({ revalidated: true });
 }
