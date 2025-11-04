@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getClient } from "@/lib/apollo";
 import { GET_PORTFOLIO_ITEM } from "@/graphql/portfolio";
 
@@ -28,10 +28,12 @@ type PortfolioItemResponse = {
   };
 };
 
-export async function GET(_: Request, { params }: { params: { slug: string } }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ slug: string }> }) {
   try {
-    const slug = params?.slug;
-    if (!slug) return NextResponse.json({ ok: false, error: "missing slug" }, { status: 400 });
+    const { slug } = await context.params; // 👈 Next 16: params é Promise
+    if (!slug) {
+      return NextResponse.json({ ok: false, error: "missing slug" }, { status: 400 });
+    }
 
     const client = getClient();
     const { data } = await client.query<PortfolioItemResponse>({

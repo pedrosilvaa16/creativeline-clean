@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getClient } from "@/lib/apollo";
 import { GET_PORTFOLIO_LIST } from "@/graphql/portfolio";
 
@@ -6,7 +6,7 @@ type PortfolioListResponse = {
   portfolios?: { nodes?: { id: string; slug: string; title: string }[] };
 };
 
-export async function GET() {
+export async function GET(_req: NextRequest) {
   try {
     const client = getClient();
     const { data } = await client.query<PortfolioListResponse>({
