@@ -5,12 +5,24 @@ import { GET_PORTFOLIO_ITEM, GET_PORTFOLIO_LIST } from "@/graphql/portfolio";
 
 export const revalidate = 60;
 
+type PortfolioListResponse = {
+  portfolios?: {
+    nodes?: {
+      slug: string;
+    }[];
+  };
+};
+
 export async function generateStaticParams() {
-  // Pré-gerar alguns slugs (ISR cobre o resto)
   const client = getClient();
-  const { data } = await client.query({ query: GET_PORTFOLIO_LIST });
-  const nodes = data?.portfolios?.nodes ?? [];
-  return nodes.slice(0, 20).map((n: any) => ({ slug: n.slug }));
+
+  const { data } = await client.query<PortfolioListResponse>({
+    query: GET_PORTFOLIO_LIST,
+  });
+
+  const nodes = data.portfolios?.nodes ?? [];
+
+  return nodes.slice(0, 20).map((n) => ({ slug: n.slug }));
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
