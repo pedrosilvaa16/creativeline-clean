@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   const url = new URL(req.url);
@@ -8,11 +8,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid secret" }, { status: 401 });
   }
 
-  // Revalida páginas genéricas
-  revalidatePath("/portfolio");
+  // Revalida a listagem do portfólio
+  await revalidatePath("/portfolio");
 
-  // Se quiseres tags (quando usares fetch com { next: { tags: [...] } })
-  revalidateTag("portfolio");
-
-  return NextResponse.json({ revalidated: true });
+  return NextResponse.json({ ok: true, revalidated: true, now: Date.now() });
 }
