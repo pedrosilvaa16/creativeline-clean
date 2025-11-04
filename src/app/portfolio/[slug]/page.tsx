@@ -5,7 +5,7 @@ import { GET_PORTFOLIO_ITEM, GET_PORTFOLIO_LIST } from "@/graphql/portfolio";
 
 export const revalidate = 60;
 
-// 🔹 Tipo para lista de portfólios (generateStaticParams)
+// 🔹 Tipo para lista (usado em generateStaticParams)
 type PortfolioListResponse = {
   portfolios?: {
     nodes?: {
@@ -14,7 +14,7 @@ type PortfolioListResponse = {
   };
 };
 
-// 🔹 Tipo para item individual (Page)
+// 🔹 Tipo para item individual (detalhe do portfólio)
 type PortfolioItemResponse = {
   portfolio?: {
     id: string;
@@ -38,15 +38,26 @@ export async function generateStaticParams() {
 
   const nodes = data?.portfolios?.nodes ?? [];
 
-  return nodes.slice(0, 20).map((n) => ({ slug: n.slug }));
+  // Apenas slugs válidos
+  return nodes
+    .filter((n) => !!n?.slug)
+    .slice(0, 20)
+    .map((n) => ({ slug: n.slug }));
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({ params }: { params?: { slug?: string } }) {
   const client = getClient();
+
+  // ⚙️ Proteção extra — evita erro "$slug of required type ID! was not provided"
+  const slug = params?.slug;
+  if (!slug) {
+    console.error("❌ Missing slug param in portfolio/[slug]/page.tsx");
+    return notFound();
+  }
 
   const { data } = await client.query<PortfolioItemResponse>({
     query: GET_PORTFOLIO_ITEM,
-    variables: { slug: params.slug },
+    variables: { slug },
   });
 
   const p = data?.portfolio;
@@ -55,6 +66,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   return (
     <main className="container mx-auto px-6 py-16">
       <h1 className="text-3xl font-medium mb-6">{p.title}</h1>
+
       {p?.portfolioFields?.heroImage?.node?.mediaItemUrl && (
         <div className="aspect-video relative mb-8 bg-neutral-100">
           <Image
@@ -65,6 +77,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
           />
         </div>
       )}
+
       {p?.portfolioFields?.summary && (
         <p className="text-neutral-600 max-w-2xl">{p.portfolioFields.summary}</p>
       )}
