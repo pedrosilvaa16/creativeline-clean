@@ -13,7 +13,7 @@ type PortfolioListResponse = {
   };
 };
 
-eexport async function generateStaticParams() {
+export async function generateStaticParams() {
   const client = getClient();
 
   const { data } = await client.query<PortfolioListResponse>({
