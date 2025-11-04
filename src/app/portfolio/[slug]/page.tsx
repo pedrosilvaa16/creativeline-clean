@@ -5,6 +5,16 @@ import { GET_PORTFOLIO_ITEM, GET_PORTFOLIO_LIST } from "@/graphql/portfolio";
 
 export const revalidate = 60;
 
+// 🔹 Tipo para lista de portfólios (generateStaticParams)
+type PortfolioListResponse = {
+  portfolios?: {
+    nodes?: {
+      slug: string;
+    }[];
+  };
+};
+
+// 🔹 Tipo para item individual (Page)
 type PortfolioItemResponse = {
   portfolio?: {
     id: string;
@@ -33,11 +43,11 @@ export async function generateStaticParams() {
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const client = getClient();
-  const { data } = await client.query<PortfolioItemResponse>({
-  query: GET_PORTFOLIO_ITEM,
-  variables: { slug: params.slug },
-});
 
+  const { data } = await client.query<PortfolioItemResponse>({
+    query: GET_PORTFOLIO_ITEM,
+    variables: { slug: params.slug },
+  });
 
   const p = data?.portfolio;
   if (!p) return notFound();
