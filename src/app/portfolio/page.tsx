@@ -61,3 +61,14 @@ export default async function Page() {
                 </h2>
                 {p?.portfolioFields?.summary && (
                   <p className="text-neutral-600 text-sm line-clamp-3">
+                    {p.portfolioFields.summary}
+                  </p>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
