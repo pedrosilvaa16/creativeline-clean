@@ -1,52 +1,83 @@
+// src/components/common/ModalVideo.tsx
 "use client";
-import { useEffect, useRef } from "react";
 
-type Props = {
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
+
+type Channel = "youtube" | "vimeo";
+
+export type Props = {
   isOpen: boolean;
   onClose: () => void;
-  /** "youtube" | "vimeo" — por ora só YouTube no exemplo */
-  channel?: "youtube" | "vimeo";
+  channel?: Channel;
   videoId: string;
+  autoplay?: boolean;   // opcional
+  title?: string;       // <- adicionar esta prop
 };
 
-export default function ModalVideo({ isOpen, onClose, channel = "youtube", videoId }: Props) {
-  const ref = useRef<HTMLDialogElement>(null);
+function buildSrc(channel: Channel, id: string, autoplay: boolean) {
+  if (channel === "vimeo") {
+    const ap = autoplay ? 1 : 0;
+    return `https://player.vimeo.com/video/${id}?autoplay=${ap}&muted=0&byline=0&portrait=0`;
+  }
+  const ap = autoplay ? 1 : 0;
+  return `https://www.youtube.com/embed/${id}?autoplay=${ap}&rel=0&modestbranding=1`;
+}
 
+export default function ModalVideo({
+  isOpen,
+  onClose,
+  channel = "youtube",
+  videoId,
+  autoplay = true,
+  title = "Video modal",
+}: Props) {
   useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    if (isOpen && !dialog.open) dialog.showModal();
-    if (!isOpen && dialog.open) dialog.close();
-  }, [isOpen]);
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = original;
+    };
+  }, [isOpen, onClose]);
 
-  const src =
-    channel === "youtube"
-      ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
-      : `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+  if (!isOpen) return null;
 
-  return (
-    <dialog
-      ref={ref}
-      onClose={onClose}
-      className="rounded-xl p-0 backdrop:bg-black/60"
-      style={{ width: "min(90vw, 960px)" }}
+  const src = buildSrc(channel, videoId, autoplay);
+
+  const ui = (
+    <div
+      aria-modal="true"
+      role="dialog"
+      aria-label={title}
+      className="cl-modalvideo__overlay"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        className="absolute right-3 top-3 z-10 rounded-full border px-2 py-1 text-sm"
-      >
-        ✕
-      </button>
-      <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
-        <iframe
-          src={src}
-          title="Video"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-        />
+      <div className="cl-modalvideo__content">
+        <button
+          type="button"
+          className="cl-modalvideo__close"
+          aria-label="Fechar vídeo"
+          onClick={onClose}
+        >
+          ×
+        </button>
+
+        <div className="cl-modalvideo__framewrap">
+          <iframe
+            className="cl-modalvideo__iframe"
+            src={src}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title={title} // <- usar a prop
+          />
+        </div>
       </div>
-    </dialog>
+    </div>
   );
+
+  return typeof document !== "undefined" ? createPortal(ui, document.body) : null;
 }
