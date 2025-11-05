@@ -109,13 +109,12 @@ const AboutV2 = () => {
         </div>
       </div>
 
-      {/* Modal de vídeo local */}
+      {/* Modal de vídeo locall */}
       <ModalVideo
         isOpen={isOpen}
         onClose={() => setOpen(false)}
         channel="youtube"
         videoId="izTDbJ23_ws"
-        autoplay
         title="About video"
       />
     </>
