@@ -1,14 +1,14 @@
 "use client";
 
-import SplitAnimation from '../animation/SplitAnimation';
-import Image from 'next/image';
+import SplitAnimation from "../animation/SplitAnimation";
+import Image from "next/image";
 import banner1 from "@/assets/img/banner/1.jpg";
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import ModalVideo from '@/components/common/ModalVideo'; // <-- usa o seu componente local
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import ModalVideo from "@/components/common/ModalVideo";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Counter from '../counter/Counter';
+import Counter from "../counter/Counter";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -38,16 +38,20 @@ const AboutV2 = () => {
       duration: 1,
     });
 
-    tl.from(".home-container .video", {
-      opacity: 0,
-      y: -100,
-      duration: 1,
-    }, "<");
+    tl.from(
+      ".home-container .video",
+      {
+        opacity: 0,
+        y: -100,
+        duration: 1,
+      },
+      "<"
+    );
 
     return () => {
       tl.scrollTrigger?.kill();
       tl.kill();
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
 
@@ -67,7 +71,9 @@ const AboutV2 = () => {
               <div className="experience-card">
                 <div className="fun-fact">
                   <div className="counter">
-                    <div className="timer"><Counter end={38} /></div>
+                    <div className="timer">
+                      <Counter end={38} />
+                    </div>
                     <div className="operator">K</div>
                   </div>
                   <span className="medium">Completed Projects</span>
@@ -92,14 +98,16 @@ const AboutV2 = () => {
 
         <div className="relative overflow-hidden">
           <div className="home-container" ref={homeContainerRef}>
-            {/* Se o import estático de imagem retornar metadados, não precisa width/height. */}
             <Image src={banner1} alt="Image Not Found" priority />
             <div className="video">
               <Link
                 href="#"
                 scroll={false}
                 className="popup-youtube video-play-button"
-                onClick={(e) => { e.preventDefault(); setOpen(true); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpen(true);
+                }}
               >
                 <i className="fas fa-play" />
                 <div className="effect" />
@@ -109,7 +117,6 @@ const AboutV2 = () => {
         </div>
       </div>
 
-      {/* Modal de vídeo locall */}
       <ModalVideo
         isOpen={isOpen}
         onClose={() => setOpen(false)}
