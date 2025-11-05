@@ -9,7 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SkillProgress from '../process/SkillProgress';
 import SkillProgressData from "@/assets/jsonData/progress/SkillProgressData.json";
-import ModalVideo from 'react-modal-video';
+import ModalVideo from '@/components/common/ModalVideo';
 import { useState } from 'react';
 import TextScrollAnimation from '../animation/TextScrollAnimation';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
