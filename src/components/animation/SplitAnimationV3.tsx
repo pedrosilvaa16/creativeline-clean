@@ -1,67 +1,82 @@
-"use client"
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { SplitText } from "../../types/SplitText.min.js";
+"use client";
 
-// Register GSAP plugins
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 gsap.registerPlugin(ScrollTrigger);
 
+type SplitTextCtor = new (
+  target: Element | string,
+  vars?: Record<string, any>
+) => { revert: () => void; chars?: Element[]; words?: Element[]; lines?: Element[] };
+
 interface SplitAnimationProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const SplitAnimationV3 = ({ children }: SplitAnimationProps) => {
-    const textRef = useRef<HTMLDivElement | null>(null);
-    const [SplitTextConstructor, setSplitTextConstructor] = useState<typeof SplitText | null>(null);
+  const textRef = useRef<HTMLHeadingElement | null>(null);
+  const [SplitText, setSplitText] = useState<SplitTextCtor | null>(null);
 
-    // Dynamically import SplitText
-    useEffect(() => {
-        const loadSplitText = async () => {
-            try {
-                const splitTextModule = await import("../../types/SplitText.min.js");
-                setSplitTextConstructor(() => splitTextModule.SplitText);
-            } catch (error) {
-                console.error("Error loading SplitText:", error);
-            }
-        };
-        loadSplitText();
-    }, []);
+  // Carrega SplitText do pacote GSAP (sem caminho local)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        let mod: any;
+        try { mod = await import("gsap/SplitText"); } catch {}
+        if (!mod?.SplitText) { try { mod = await import("gsap/dist/SplitText"); } catch {} }
 
-    // Run the animation once SplitText is loaded
-    useEffect(() => {
-        if (SplitTextConstructor && typeof window !== "undefined" && window.innerWidth > 1023) {
-            const el = textRef.current;
-            if (el) {
-                const splitEl = new SplitTextConstructor(el, {
-                    type: "lines, words",
-                    linesClass: "line",
-                });
-
-                const splitTl = gsap.timeline({
-                    duration: 0.35,
-                    ease: "power4",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 90%",
-                    },
-                });
-
-                splitTl.from(splitEl.words, {
-                    yPercent: 100,
-                    stagger: 0.025,
-                });
-
-                return () => {
-                    splitEl.revert();
-                    splitTl.kill();
-                    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-                };
-            }
+        if (alive && mod?.SplitText) {
+          gsap.registerPlugin(mod.SplitText);
+          setSplitText(() => mod.SplitText as SplitTextCtor);
+        } else if (alive) {
+          console.warn("[SplitAnimationV3] Não foi possível carregar o SplitText do GSAP.");
         }
-    }, [SplitTextConstructor]);
+      } catch (e) {
+        console.error("Erro ao carregar SplitText:", e);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
 
-    return <h2 ref={textRef} className="title-left split-text">{children}</h2>;
+  // Anima quando SplitText estiver disponível
+  useEffect(() => {
+    if (!SplitText) return;
+    if (typeof window === "undefined" || window.innerWidth <= 1023) return;
+
+    const el = textRef.current;
+    if (!el) return;
+
+    const splitEl = new SplitText(el, {
+      type: "lines, words",
+      linesClass: "line",
+    });
+
+    const splitTl = gsap.timeline({
+      defaults: { duration: 0.35, ease: "power4.out" },
+      scrollTrigger: {
+        trigger: el,
+        start: "top 90%",
+        once: true,
+      },
+    });
+
+    splitTl.from(splitEl.words ?? [el], {
+      yPercent: 100,
+      opacity: 0,
+      stagger: 0.025,
+    });
+
+    return () => {
+      splitTl.scrollTrigger?.kill();
+      splitTl.kill();
+      splitEl.revert();
+    };
+  }, [SplitText]);
+
+  return <h2 ref={textRef} className="title-left split-text">{children}</h2>;
 };
 
 export default SplitAnimationV3;
