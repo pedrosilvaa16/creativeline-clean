@@ -29,7 +29,8 @@ const SplitAnimation = ({
     let alive = true;
     (async () => {
       try {
-        let mod: any;
+        type GsapSplitModule = { SplitText?: SplitTextCtor };
+        let mod: GsapSplitModule | undefined;
         // 1) tentativa padrão
         try { mod = await import("gsap/SplitText"); } catch {}
         // 2) fallback para dist

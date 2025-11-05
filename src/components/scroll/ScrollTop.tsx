@@ -1,4 +1,3 @@
-// src/components/scroll/ScrollTop.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -10,7 +9,7 @@ type Props = {
   zIndex?: number;
   withProgress?: boolean;
   className?: string;
-  icon?: React.ReactNode; // 👈 permite passar o <i class="fas fa-long-arrow-up" />
+  icon?: React.ReactNode;
 };
 
 export default function ScrollTop({
@@ -18,7 +17,7 @@ export default function ScrollTop({
   right = 24,
   bottom = 24,
   zIndex = 60,
-  withProgress = false, // demo padrão não tem progress
+  withProgress = false,
   className = "",
   icon,
 }: Props) {
@@ -31,7 +30,10 @@ export default function ScrollTop({
       const height =
         document.documentElement.scrollHeight -
         document.documentElement.clientHeight;
-      const p = height > 0 ? Math.min(100, Math.max(0, (scrollTop / height) * 100)) : 0;
+      const p =
+        height > 0
+          ? Math.min(100, Math.max(0, (scrollTop / height) * 100))
+          : 0;
       setProgress(p);
       setVisible(scrollTop > showUnder);
     },
@@ -39,13 +41,23 @@ export default function ScrollTop({
   );
 
   useEffect(() => {
-    computeProgress();
-    const onScroll = () => computeProgress();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    let rafId: number | null = null;
+
+    const update = () => {
+      computeProgress();
+      rafId = requestAnimationFrame(update);
+    };
+
+    // inicializa num raf (evita setState síncrono)
+    rafId = requestAnimationFrame(update);
+
+    window.addEventListener("scroll", computeProgress, { passive: true });
+    window.addEventListener("resize", computeProgress);
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", computeProgress);
+      window.removeEventListener("resize", computeProgress);
     };
   }, [computeProgress]);
 
@@ -53,7 +65,7 @@ export default function ScrollTop({
 
   if (!visible) return null;
 
-  const size = 48; // tamanho fixo do botão (largura/altura)
+  const size = 48;
   const style: React.CSSProperties = {
     position: "fixed",
     right,
@@ -61,10 +73,9 @@ export default function ScrollTop({
     zIndex,
     width: size,
     height: size,
-    borderRadius: "9999px"
+    borderRadius: "9999px",
   };
 
-  
   const stroke = 3;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -80,23 +91,24 @@ export default function ScrollTop({
         "scroll-top-btn",
         "relative overflow-hidden",
         "rounded-full bg-white text-black shadow-lg",
-        "relative overflow-hidden flex items-center justify-center",
-        "transition-transform hover:scale-105",
+        "flex items-center justify-center transition-transform hover:scale-105",
         className,
       ].join(" ")}
     >
       {withProgress && (
         <svg
-          width="100%" height="100%"
+          width="100%"
+          height="100%"
           viewBox={`0 0 ${size} ${size}`}
           className="absolute"
-          style={{ inset: 0, margin: "auto", transform: "rotate(-90deg)" }}    
+          style={{ inset: 0, margin: "auto", transform: "rotate(-90deg)" }}
           pointerEvents="none"
         >
-          {/* trilho de fundo */}
           <circle
-            cx={size / 2} cy={size / 2} r={radius}
-            stroke="rgba(0,0,0,0.08)"  /* ou rgba(255,255,255,.18) se preferires */
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="rgba(0,0,0,0.08)"
             strokeWidth={stroke}
             fill="transparent"
           />
@@ -104,7 +116,6 @@ export default function ScrollTop({
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="rgba(173, 230, 49, 1)"
             stroke="rgba(173, 230, 49, 1)"
             strokeWidth={stroke}
             fill="transparent"

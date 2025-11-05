@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import * as React from "react";
 
@@ -20,7 +20,7 @@ interface Props extends BaseProps {
   /** Up to ~9 recent projects to show in 3 columns (it works with fewer too). */
   recentProjects?: ProjectLink[];
   /** Banner image for the 4th column. Accepts a public path string or a static import. */
-  bannerImage?: string | any; // StaticImageData
+  bannerImage?: string | StaticImageData; // ⬅️ em vez de `any`
   /** Optional banner caption */
   bannerCaption?: string;
 }
@@ -41,91 +41,90 @@ export default function MainMenu({
   recentProjects = [],
   bannerImage = DEFAULT_BANNER,
 }: Props) {
-  const cols = toColumns(recentProjects.slice(0, 9), 3); // max 3 x 3 items
+  const cols = toColumns<ProjectLink>(recentProjects.slice(0, 9), 3); // max 3 x 3 items
 
   const handlePortfolioClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-  // No mobile abrimos o dropdown; no desktop navegamos
-  if (toggleSubMenu && window.innerWidth < 992) {
-    e.preventDefault();
-    toggleSubMenu(e);
-  }
-};
+    // No mobile abrimos o dropdown; no desktop navegamos
+    if (typeof window !== "undefined" && toggleSubMenu && window.innerWidth < 992) {
+      e.preventDefault();
+      toggleSubMenu(e);
+    }
+  };
 
   return (
-    <>
-      <ul
-        className={`nav navbar-nav ${navbarPlacement}`}
-        data-in="fadeInDown"
-        data-out="fadeOutUp"
-      >
-        {/* Simple items (no dropdowns) */}
-        <li>
-          <Link href="/">Home</Link>
-        </li>
-        <li>
-          <Link href="/about">About</Link>
-        </li>
-        <li>
-          <Link href="/services">Services</Link>
-        </li>
+    <ul
+      className={`nav navbar-nav ${navbarPlacement}`}
+      data-in="fadeInDown"
+      data-out="fadeOutUp"
+    >
+      {/* Simple items (no dropdowns) */}
+      <li>
+        <Link href="/">Home</Link>
+      </li>
+      <li>
+        <Link href="/about">About</Link>
+      </li>
+      <li>
+        <Link href="/services">Services</Link>
+      </li>
 
-        {/* Projects — the ONLY dropdown (megamenu) */}
-        <li className="dropdown megamenu-fw megamenu-style-two column-three">
-          <Link
-            href="/portfolio"
-            className="dropdown-toggle"
-            data-toggle="dropdown"
-            onClick={handlePortfolioClick}
-          >
-            Portfolio
-          </Link>
+      {/* Projects — the ONLY dropdown (megamenu) */}
+      <li className="dropdown megamenu-fw megamenu-style-two column-three">
+        <Link
+          href="/portfolio"
+          className="dropdown-toggle"
+          data-toggle="dropdown"
+          onClick={handlePortfolioClick}
+        >
+          Portfolio
+        </Link>
 
-          <ul className="dropdown-menu megamenu-content" role="menu">
-            <li>
-              <div className="col-menu-wrap">
-                <div className="menu-cal-items">
-                  {/* 3 link columns */}
-                  {cols.map((list, colIdx) => (
-                    <div className="col-menu" key={`proj-col-${colIdx}`}>
-                      {colIdx === 0 && <h4>Our Portfolio</h4>}
-                      <ul className="menu-col">
-                        {list.length === 0 ? (
-                          <li className="disabled">
-                            <a aria-disabled>Coming soon</a>
+        <ul className="dropdown-menu megamenu-content" role="menu">
+          <li>
+            <div className="col-menu-wrap">
+              <div className="menu-cal-items">
+                {/* 3 link columns */}
+                {cols.map((list, colIdx) => (
+                  <div className="col-menu" key={`proj-col-${colIdx}`}>
+                    {colIdx === 0 && <h4>Our Portfolio</h4>}
+                    <ul className="menu-col">
+                      {list.length === 0 ? (
+                        <li className="disabled">
+                          {/* evitar <a> sem href — acessível */}
+                          <span aria-disabled="true">Coming soon</span>
+                        </li>
+                      ) : (
+                        list.map((p, i) => (
+                          <li key={`${p.href}-${i}`}>
+                            <Link href={p.href}>{p.title}</Link>
                           </li>
-                        ) : (
-                          list.map((p, i) => (
-                            <li key={`${p.href}-${i}`}>
-                              <Link href={p.href}>{p.title}</Link>
-                            </li>
-                          ))
-                        )}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-
-                {/* 4th column: image banner */}
-                <div className="megamenu-banner">
-                  <div className="thumb">
-                    <Image
-                      src={bannerImage || DEFAULT_BANNER}
-                      alt="Projects highlight"
-                      width={640}
-                      height={360}
-                      priority={false}
-                    />
+                        ))
+                      )}
+                    </ul>
                   </div>
+                ))}
+              </div>
+
+              {/* 4th column: image banner */}
+              <div className="megamenu-banner">
+                <div className="thumb">
+                  <Image
+                    src={bannerImage || DEFAULT_BANNER}
+                    alt="Projects highlight"
+                    width={640}
+                    height={360}
+                    priority={false}
+                  />
                 </div>
               </div>
-            </li>
-          </ul>
-        </li>
+            </div>
+          </li>
+        </ul>
+      </li>
 
-        <li>
-          <Link href="/contact">Contact</Link>
-        </li>
-      </ul>
-    </>
+      <li>
+        <Link href="/contact">Contact</Link>
+      </li>
+    </ul>
   );
 }

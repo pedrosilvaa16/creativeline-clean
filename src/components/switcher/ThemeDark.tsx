@@ -4,40 +4,30 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "theme";
 
 export default function ThemeDark() {
-  const [isDark, setIsDark] = useState(true); // dark mode por defeito
+  // lê o valor guardado logo na inicialização (evita setState no effect)
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true; // SSR fallback
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "dark") return true;
+    if (saved === "light") return false;
+    return true; // por defeito: dark
+  });
 
-  // Ao montar, lê o valor guardado e aplica no <html>
+  // aplica o tema ao <html> sempre que muda isDark
   useEffect(() => {
     try {
       const html = document.documentElement;
-      const saved = localStorage.getItem(STORAGE_KEY);
-      const dark = saved ? saved === "dark" : true; // default = dark
-
-      html.classList.toggle("bg-dark", dark);
-      html.style.colorScheme = dark ? "dark" : "light";
-      setIsDark(dark);
-
-      // Se for a 1ª visita, guarda como dark
-      if (!saved) localStorage.setItem(STORAGE_KEY, "dark");
+      html.classList.toggle("bg-dark", isDark);
+      html.style.colorScheme = isDark ? "dark" : "light";
+      localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
     } catch (e) {
-      console.warn("Theme init error:", e);
+      console.warn("Theme apply error:", e);
     }
-  }, []);
+  }, [isDark]);
 
-  // Função para alternar tema
+  // alternar o tema
   const toggleTheme = () => {
-    try {
-      const html = document.documentElement;
-      const nextDark = !isDark;
-
-      html.classList.toggle("bg-dark", nextDark);
-      html.style.colorScheme = nextDark ? "dark" : "light";
-      localStorage.setItem(STORAGE_KEY, nextDark ? "dark" : "light");
-
-      setIsDark(nextDark);
-    } catch (e) {
-      console.warn("Theme toggle error:", e);
-    }
+    setIsDark((prev) => !prev);
   };
 
   return (

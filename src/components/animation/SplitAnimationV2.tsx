@@ -24,7 +24,8 @@ const SplitAnimationV2 = ({ children }: SplitAnimationProps) => {
     let alive = true;
     (async () => {
       try {
-        let mod: any;
+        type GsapSplitModule = { SplitText?: SplitTextCtor };
+        let mod: GsapSplitModule | undefined;
         try { mod = await import("gsap/SplitText"); } catch {}
         if (!mod?.SplitText) { try { mod = await import("gsap/dist/SplitText"); } catch {} }
 

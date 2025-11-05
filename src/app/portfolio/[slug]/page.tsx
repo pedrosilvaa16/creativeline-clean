@@ -10,7 +10,6 @@ import { GET_PORTFOLIO_ITEM, GET_PORTFOLIO_LIST } from "@/graphql/portfolio";
 
 import Breadcrumb from "@/components/breadcrumb/Breadcrumb";
 import ThemeDark from "@/components/switcher/ThemeDark";
-import ModalVideo from "@/components/common/ModalVideo";
 
 export const revalidate = 60;
 
