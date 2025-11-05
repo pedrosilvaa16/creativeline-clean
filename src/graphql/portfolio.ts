@@ -1,5 +1,15 @@
+// /src/graphql/portfolio.ts
 import { gql } from "@apollo/client";
 
+/**
+ * ===============================
+ * PORTFOLIO LIST  (/portfolio)
+ * ===============================
+ * - Lista básica de projetos
+ * - Campos ACF principais (clientName)
+ * - Featured image nativa
+ * - Categorias (taxonomia PORTFOLIOCATEGORY)
+ */
 export const GET_PORTFOLIO_LIST = gql`
   query GetPortfolioList($first: Int = 24) {
     portfolios(first: $first, where: { status: PUBLISH }) {
@@ -8,13 +18,29 @@ export const GET_PORTFOLIO_LIST = gql`
         slug
         title
         date
+
         portfolioFields {
-          summary
-          heroImage {
-            node {
-              mediaItemUrl
-              mediaDetails { width height }
+          clientName
+        }
+
+        featuredImage {
+          node {
+            mediaItemUrl
+            altText
+            mediaDetails {
+              width
+              height
             }
+          }
+        }
+
+        # Categorias ligadas à taxonomia PORTFOLIOCATEGORY
+        terms(where: { taxonomies: [PORTFOLIOCATEGORY] }) {
+          nodes {
+            id
+            name
+            slug
+            uri
           }
         }
       }
@@ -22,6 +48,14 @@ export const GET_PORTFOLIO_LIST = gql`
   }
 `;
 
+/**
+ * ===============================
+ * SINGLE PORTFOLIO  (/portfolio/[slug])
+ * ===============================
+ * - Campos ACF (heroImage, gallery, sideBlock, videos, poster)
+ * - Taxonomia PORTFOLIOCATEGORY
+ * - SEO e autor
+ */
 export const GET_PORTFOLIO_ITEM = gql`
   query GetPortfolioItem($slug: ID!) {
     portfolio(id: $slug, idType: SLUG) {
@@ -29,28 +63,137 @@ export const GET_PORTFOLIO_ITEM = gql`
       slug
       title
       date
+
       portfolioFields {
+        clientName
+        projectTagline
         summary
+
         heroImage {
-          node { mediaItemUrl mediaDetails { width height } }
+          node {
+            mediaItemUrl
+            altText
+            mediaDetails {
+              width
+              height
+            }
+          }
         }
+
+        sideBlock {
+          sideText
+          leftImage {
+            node {
+              mediaItemUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+          rightImage {
+            node {
+              mediaItemUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+        }
+
         gallery {
           edges {
             node {
               mediaItemUrl
-              mediaDetails { width height }
+              altText
+              mediaDetails {
+                width
+                height
+              }
             }
           }
         }
-        sectionBackground
-        sectionChallenges
-        sectionSolution
+
+        mediaGallery {
+          edges {
+            node {
+              mediaItemUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+        }
+
+        mediaVideos {
+          videoUrl
+          videoFile {
+            node {
+              mediaItemUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+        }
+
+        poster {
+          node {
+            mediaItemUrl
+            altText
+            mediaDetails {
+              width
+              height
+            }
+          }
+        }
       }
-      portfolioCategories { nodes { id name slug } }
+
+      # 🔹 Taxonomia principal para o botão verde do single
+      terms(where: { taxonomies: [PORTFOLIOCATEGORY] }) {
+        nodes {
+          id
+          name
+          slug
+          uri
+        }
+      }
+
       author {
-        node { name description avatar { url } }
+        node {
+          name
+          description
+          avatar {
+            url
+          }
+        }
       }
-      seo { title metaDesc opengraphImage { mediaItemUrl } }
+
+      seo {
+        title
+        metaDesc
+        opengraphImage {
+          mediaItemUrl
+        }
+      }
+
+      featuredImage {
+        node {
+          mediaItemUrl
+          altText
+          mediaDetails {
+            width
+            height
+          }
+        }
+      }
     }
   }
 `;

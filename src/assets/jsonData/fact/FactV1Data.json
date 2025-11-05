@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "animation": "fadeInDown",
+        "count": 360,
+        "suffix": "K",
+        "label": "World Customer",
+        "duration": "0"
+    },
+    {
+        "id": 2,
+        "animation": "fadeInUp",
+        "count": 98,
+        "suffix": "%",
+        "label": "Positive Rating",
+        "duration": "0.5s"
+    },
+    {
+        "id": 3,
+        "animation": "fadeInDown",
+        "count": 874,
+        "suffix": "+",
+        "label": "Total Branch",
+        "duration": "0"
+    },
+    {
+        "id": 4,
+        "animation": "fadeInUp",
+        "count": 35,
+        "suffix": "",
+        "label": "Years experience",
+        "duration": "0.5s"
+    }
+]

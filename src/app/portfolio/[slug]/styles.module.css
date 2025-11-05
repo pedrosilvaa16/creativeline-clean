@@ -1,0 +1,27 @@
+.sideCover {
+  position: relative;
+  width: 305px;
+  height: 380px;
+  margin: 0 auto;
+}
+
+@media (max-width: 991px) {
+  .sideCover {
+  position: relative;
+  width: 100%;        /* enche a largura da coluna */
+  max-width: 305px;   /* mas não passa de 305 */
+  height: 380px;      /* altura fixa da “capa” */
+  margin: 0;          /* NÃO centres: remove o auto */
+}
+
+@media (max-width: 991px) {
+  .sideCover {
+    max-width: none;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 305 / 380;
+  }
+}
+
+.objectFitCover { object-fit: cover; }
+}
