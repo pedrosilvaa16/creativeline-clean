@@ -6,10 +6,24 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** Vars mínimas (compatível com GSAP) */
+type SplitVars = {
+  /** "chars", "words", "lines" (pode combinar com vírgulas) */
+  type: string;
+  linesClass?: string;
+  [k: string]: unknown;
+};
+
+/** Forma mínima do SplitText que precisamos */
 type SplitTextCtor = new (
   target: Element | string,
-  vars?: Record<string, any>
-) => { revert: () => void; chars?: Element[]; words?: Element[]; lines?: Element[] };
+  vars?: SplitVars
+) => {
+  revert: () => void;
+  chars?: Element[];
+  words?: Element[];
+  lines?: Element[];
+};
 
 interface SplitAnimationProps {
   children: React.ReactNode;
@@ -19,23 +33,24 @@ const SplitAnimationV4 = ({ children }: SplitAnimationProps) => {
   const textRef = useRef<HTMLHeadingElement | null>(null);
   const [SplitText, setSplitText] = useState<SplitTextCtor | null>(null);
 
-  // Carrega SplitText via GSAP (sem caminho local)
+  // Import dinâmico do SplitText (sem depender da d.ts oficial do módulo)
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        type GsapSplitModule = { SplitText?: SplitTextCtor };
-        let mod: GsapSplitModule | undefined;
+        let mod: unknown;
         try { mod = await import("gsap/SplitText"); } catch {}
-        if (!mod?.SplitText) { try { mod = await import("gsap/dist/SplitText"); } catch {} }
+        if (!mod) {
+          try { mod = await import("gsap/dist/SplitText"); } catch {}
+        }
 
-        if (alive && mod?.SplitText) {
-          gsap.registerPlugin(mod.SplitText);
-          setSplitText(() => mod.SplitText as SplitTextCtor);
+        const maybeCtor = (mod as Record<string, unknown> | undefined)?.["SplitText"];
+
+        if (alive && typeof maybeCtor === "function") {
+          gsap.registerPlugin(maybeCtor as any);
+          setSplitText(() => maybeCtor as SplitTextCtor);
         } else if (alive) {
-          console.warn(
-            "[SplitAnimationV4] Não foi possível carregar o SplitText a partir do pacote GSAP."
-          );
+          console.warn("[SplitAnimationV4] Não foi possível carregar o SplitText do GSAP.");
         }
       } catch (e) {
         console.error("Erro ao carregar SplitText:", e);
@@ -52,10 +67,7 @@ const SplitAnimationV4 = ({ children }: SplitAnimationProps) => {
     const el = textRef.current;
     if (!el) return;
 
-    const splitEl = new SplitText(el, {
-      type: "lines, words",
-      linesClass: "line",
-    });
+    const splitEl = new SplitText(el, { type: "lines, words", linesClass: "line" });
 
     const splitTl = gsap.timeline({
       defaults: { duration: 0.35, ease: "power4.out" },
@@ -66,7 +78,7 @@ const SplitAnimationV4 = ({ children }: SplitAnimationProps) => {
       },
     });
 
-    splitTl.from(splitEl.words ?? [el], {
+    splitTl.from((splitEl.words?.length ? splitEl.words : splitEl.lines) ?? [el], {
       yPercent: 100,
       opacity: 0,
       stagger: 0.025,
