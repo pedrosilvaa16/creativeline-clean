@@ -6,15 +6,31 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** Vars mínimas para o SplitText que usamos (compatível com GSAP). */
+type SplitVars = {
+  /** "chars" | "words" | "lines" (podes combinar com vírgulas) */
+  type: string;
+  linesClass?: string;
+  [k: string]: unknown;
+};
+
+/** Forma mínima do SplitText que precisamos (método revert e coleções). */
 type SplitTextCtor = new (
   target: Element | string,
-  vars?: Record<string, any>
-) => { revert: () => void; chars?: Element[]; words?: Element[]; lines?: Element[] };
+  vars?: SplitVars
+) => {
+  revert: () => void;
+  chars?: Element[];
+  words?: Element[];
+  lines?: Element[];
+};
 
 interface SplitAnimationProps {
   children: React.ReactNode;
-  minWidth?: number;      // breakpoint mínimo
-  splitType?: string;     // "chars", "words", "lines"
+  /** breakpoint mínimo para aplicar o efeito */
+  minWidth?: number;
+  /** "chars", "words", "lines" (pode combinar com vírgulas) */
+  splitType?: string;
 }
 
 const SplitAnimation = ({
@@ -27,29 +43,46 @@ const SplitAnimation = ({
 
   useEffect(() => {
     let alive = true;
+
     (async () => {
       try {
-        type GsapSplitModule = { SplitText?: SplitTextCtor };
-        let mod: GsapSplitModule | undefined;
-        // 1) tentativa padrão
-        try { mod = await import("gsap/SplitText"); } catch {}
-        // 2) fallback para dist
-        if (!mod?.SplitText) { try { mod = await import("gsap/dist/SplitText"); } catch {} }
+        // Não tipamos o módulo diretamente para evitar conflitos com o tipo oficial do GSAP.
+        let mod: unknown;
 
-        if (alive && mod?.SplitText) {
-          gsap.registerPlugin(mod.SplitText);
-          setSplitText(() => mod.SplitText as SplitTextCtor);
+        try {
+          mod = await import("gsap/SplitText");
+        } catch {
+          // fallback para builds que expõem em /dist
+        }
+        if (!mod) {
+          try {
+            mod = await import("gsap/dist/SplitText");
+          } catch {
+            // fica undefined se não existir
+          }
+        }
+
+        // Extrai SplitText do módulo desconhecido de forma segura
+        const maybeCtor =
+          (mod as Record<string, unknown> | undefined)?.["SplitText"];
+
+        if (alive && typeof maybeCtor === "function") {
+          // registar plugin e guardar o construtor com o nosso tipo mínimo
+          gsap.registerPlugin(maybeCtor as any);
+          setSplitText(() => maybeCtor as SplitTextCtor);
         } else if (alive) {
           console.warn(
-            "[SplitAnimation] Não foi possível carregar o SplitText. " +
-            "Confirme se o plugin está disponível no pacote gsap."
+            "[SplitAnimation] Não foi possível carregar o SplitText do GSAP."
           );
         }
       } catch (e) {
         console.error("Erro ao carregar SplitText:", e);
       }
     })();
-    return () => { alive = false; };
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -80,7 +113,11 @@ const SplitAnimation = ({
     };
   }, [SplitText, minWidth, splitType]);
 
-  return <div ref={textRef} className="split-text">{children}</div>;
+  return (
+    <div ref={textRef} className="split-text">
+      {children}
+    </div>
+  );
 };
 
 export default SplitAnimation;
