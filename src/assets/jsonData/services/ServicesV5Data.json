@@ -14,25 +14,25 @@
     {
         "id": 3,
         "number": "03",
-        "title": "Branding Solutions",
+        "title": "Websites",
         "thumb": "21.jpg"
     },
     {
         "id": 4,
         "number": "04",
-        "title": "Development",
+        "title": "Branding",
         "thumb": "33.jpg"
     },
     {
         "id": 5,
         "number": "05",
-        "title": "Growth Tracking",
+        "title": "UI / UX Design",
         "thumb": "34.jpg"
     },
     {
         "id": 6,
         "number": "06",
-        "title": "Consultant",
+        "title": "E-commerce",
         "thumb": "36.jpg"
     }
 ]

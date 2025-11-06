@@ -116,7 +116,7 @@ const AboutV2 = () => {
           </div>
         </div>
       </div>
-
+      
       <ModalVideo
         isOpen={isOpen}
         onClose={() => setOpen(false)}

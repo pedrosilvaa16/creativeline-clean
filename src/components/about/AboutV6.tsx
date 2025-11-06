@@ -1,5 +1,5 @@
 "use client"
-import thumb2 from "@/assets/img/thumb/2.jpg";
+import thumb2 from "@/assets/img/thumb/21.jpg";
 import arrowIcon from "@/assets/img/icon/arrow.png";
 import Image from "next/image";
 import ServiceListData from "@/assets/jsonData/services/ServiceListData.json";

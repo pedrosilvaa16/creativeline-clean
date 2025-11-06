@@ -1,16 +1,16 @@
 [
     {
         "id": 1,
-        "thumb": "1.jpg",
+        "thumb": "2-2.jpg",
         "thumbLight": "43.jpg",
-        "text": "Motion",
-        "textBold": "Graphics"
+        "text": "Digital",
+        "textBold": "Marketing"
     },
     {
         "id": 2,
-        "thumb": "2.jpg",
+        "thumb": "1-1.jpg",
         "thumbLight": "42.jpg",
-        "text": "Market",
-        "textBold": "Branding"
+        "text": "App",
+        "textBold": "Develop"
     }
 ]

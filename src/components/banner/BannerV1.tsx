@@ -17,10 +17,10 @@ const BannerV1 = () => {
                             <div className="banner-style-one-heading">
                                 <div className="banner-title">
                                     <SplitAnimationV3>
-                                        Designing
+                                        Creating
                                     </SplitAnimationV3>
                                     <SplitAnimationV4>
-                                        Creative
+                                        Growth
                                     </SplitAnimationV4>
                                 </div>
                                 <div className="thumb wow fadeInRight">
@@ -32,14 +32,14 @@ const BannerV1 = () => {
                         <div className="col-xl-4 offset-xl-1">
                             <div className="banner-style-one-info wow fadeInUp" data-wow-delay="1s" data-wow-duration="0.6s">
                                 <div className="top-info">
-                                    <h4>Based On Australia</h4>
+                                    <h4>Tailored solutions.</h4>
                                     <p>
-                                        Uburb, State Abbreviation, Postcode
+                                        Limitless possibilities.
                                     </p>
                                 </div>
                                 <div className="bottom">
                                     <p>
-                                        Excellence projecting is devonshire dispatched remarkably on estimating. Side in so life past. Continue indulged speaking the was out horrible for domestic.
+                                        We build brands, websites, and digital experiences that perform. Based in Portugal. Working globally.
                                     </p>
                                     <Link href="/project" className="btn-style-two mt-30"><i className="fas fa-long-arrow-right" /> Our <br /> Projects</Link>
                                 </div>

@@ -45,7 +45,6 @@ export default function Dependency() {
       <div className="theme-switcher-fixed">
         <ThemeDark />
       </div>
-
       {/* === Toast notifications === */}
       <ToastContainer position="bottom-right" autoClose={3000} />
     </>
