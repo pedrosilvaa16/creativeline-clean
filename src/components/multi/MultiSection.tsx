@@ -1,4 +1,3 @@
-// /src/components/multi/MultiSection.tsx
 "use client";
 import { useRef } from "react";
 import useHorizontalScroll from "@/hooks/useHorizontalScroll";
@@ -13,15 +12,9 @@ const MultiSection = () => {
   return (
     <section className="multi-section" ref={wrapRef}>
       <div className="thecontainer">
-        <div className="panel">
-          <WhyChooseV1 />
-        </div>
-        <div className="panel bg-gray">
-          <ExpertiseV1 />
-        </div>
-        <div className="panel contact-panel">
-          <ProjectIdeaV1 />
-        </div>
+        <div className="panel"><WhyChooseV1 /></div>
+        <div className="panel bg-gray"><ExpertiseV1 /></div>
+        <div className="panel contact-panel"><ProjectIdeaV1 /></div>
       </div>
     </section>
   );
