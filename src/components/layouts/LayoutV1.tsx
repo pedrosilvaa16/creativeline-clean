@@ -1,5 +1,3 @@
-import FooterV4 from "../footer/FooterV4";
-
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -12,7 +10,6 @@ const LayoutV1 = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-dvh flex flex-col">
       <main className="flex-1">{children}</main>
-      <FooterV4 sectionClass="bg-gray" />
     </div>
   );
 };

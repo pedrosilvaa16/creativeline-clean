@@ -197,3 +197,43 @@ export const GET_PORTFOLIO_ITEM = gql`
     }
   }
 `;
+
+// PAGINAÇÃO PARA O ARCHIVE (/portfolio)
+export const GET_PORTFOLIO_ARCHIVE = gql`
+  query GetPortfolioArchive($first: Int! = 8, $after: String) {
+    portfolios(
+      first: $first
+      after: $after
+      where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        id
+        slug
+        uri
+        title
+        excerpt
+
+        portfolioFields {
+          clientName
+        }
+
+        featuredImage {
+          node {
+            mediaItemUrl
+            altText
+            mediaDetails { width height }
+          }
+        }
+
+        # Taxonomia PORTFOLIOCATEGORY (para a "tag" do card)
+        portfolioCategories: terms(where: { taxonomies: [PORTFOLIOCATEGORY] }) {
+          nodes { id name slug uri }
+        }
+      }
+    }
+  }
+`;
