@@ -1,54 +1,39 @@
-import { RefObject, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 👇 aceita RefObject<HTMLDivElement | null>
-const useHorizontalScroll = (wrapRef: RefObject<HTMLDivElement | null>) => {
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
+const useHorizontalScroll = () => {
+    const animationRef = useRef<gsap.core.Tween | null>(null);
 
-    const mm = gsap.matchMedia();
-    let ctx: gsap.Context | undefined;
+    useEffect(() => {
+        // ✅ Use matchMedia for better performance
+        const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 1024px)", () => {
-      const container = wrap.querySelector<HTMLDivElement>(".thecontainer");
-      if (!container) return;
+        mm.add("(min-width: 1024px)", () => {
+            const sections = gsap.utils.toArray<HTMLElement>(".panel");
+            const container = document.querySelector<HTMLDivElement>(".thecontainer");
 
-      ctx = gsap.context(() => {
-        const sections = gsap.utils.toArray<HTMLElement>(".panel");
-        if (!sections.length) return;
-
-        const totalScroll = () =>
-          Math.max(container.scrollWidth - window.innerWidth, 0);
-
-        gsap.set(container, { display: "flex" });
-        gsap.set(sections, { flex: "0 0 100vw", height: "100vh" });
-
-        gsap.to(sections, {
-          xPercent: -100 * (sections.length - 1),
-          ease: "none",
-          scrollTrigger: {
-            trigger: wrap,
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            pinSpacing: true,
-            end: () => `+=${totalScroll()}`,
-            invalidateOnRefresh: true,
-            // markers: true,
-          },
+            if (container && sections.length > 0) {
+                animationRef.current = gsap.to(sections, {
+                    xPercent: -100 * (sections.length - 1),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: container,
+                        pin: true,
+                        scrub: 1,
+                        end: () => `+=${container.offsetWidth}`,
+                    },
+                });
+            }
         });
-      }, wrapRef);
-    });
 
-    return () => {
-      mm.revert();
-      ctx?.revert();
-    };
-  }, [wrapRef]);
+        // ✅ Cleanup
+        return () => {
+            mm.revert(); // Cleans up all matchMedia animations
+        };
+    }, []);
 };
 
 export default useHorizontalScroll;

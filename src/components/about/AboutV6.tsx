@@ -40,10 +40,10 @@ const AboutV6 = ({ sectionClass }: DataType) => {
                                 <div className="info">
                                     <div className="d-flex">
                                         <Link href="/about-us"><Image src={arrowIcon} alt="Image Not Found" /></Link>
-                                        <h2 className="title text">Best creative & digital agency</h2>
+                                        <h2 className="title text">Design. Tech. Performance.</h2>
                                     </div>
                                     <p className="text">
-                                        Give lady of they such they sure it. Me contained explained my education. Vulgar as hearts by garret. Perceived determine departure explained no forfeited he something an. Contrasted dissimilar get joy you instrument out reasonably
+                                        We craft digital experiences that connect brands and people through design, innovation, and strategy. From concept to code, we build seamless brands for the digital era.
                                     </p>
                                 </div>
                                 <ul className="service-list">

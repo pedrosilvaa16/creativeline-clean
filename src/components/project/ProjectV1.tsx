@@ -12,11 +12,11 @@ const ProjectV1 = () => {
                                 <h4 className="sub-title">Recent Work</h4>
                                 <SplitAnimation>
                                     <p className="split-text">
-                                        Diasert carets dolor sit amet consectetur adipisicing elit. Deserunt ullam laboriosam, excepturi quibusdam ipsa sed maiores illo qui vel dicta impedit nobis sapiente culpa non quis provident ex facilis voluptates.
+                                        We partner with ambitious brands to design and develop high-performing digital solutions. From concept to launch, every detail is driven by innovation, functionality, and measurable results.
                                     </p>
                                 </SplitAnimation>
                                 <div className="portfolio-info-card">
-                                    <h5>Experience the perfect blend of creativity and functionality</h5>
+                                    <h5>Blending creative digital storytelling.</h5>
                                 </div>
                             </div>
                         </div>
