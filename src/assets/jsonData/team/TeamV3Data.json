@@ -1,8 +1,8 @@
 [
     {
         "id": 1,
-        "thumb": "1.jpg",
-        "name": "Istiak Ahmed",
+        "thumb": "pedro-silva1.jpg",
+        "name": "Pedro Silva",
         "designation": "CEO & Founder",
         "text": "Bring to the table win-win survival strategies to ensure proactive domination. At the end of the day, going forward, a new normal that has evolved.",
         "age": "28",
@@ -11,9 +11,9 @@
     },
     {
         "id": 2,
-        "thumb": "7.jpg",
-        "name": "Kevin Martin",
-        "designation": "Product Manager",
+        "thumb": "jose-vieira.jpg",
+        "name": "José Vieira",
+        "designation": "Head of Design",
         "text": "Bring to the table win-win survival strategies to ensure proactive domination. At the end of the day, going forward, a new normal that has evolved.",
         "age": "29",
         "email": "Kevin@digital.com",
@@ -21,9 +21,9 @@
     },
     {
         "id": 3,
-        "thumb": "3.jpg",
-        "name": "Sarah Albert",
-        "designation": "Financial Consultant",
+        "thumb": "ines-teixeira.jpg",
+        "name": "Inês Teixeira",
+        "designation": "Digital Marketing Manager",
         "text": "Bring to the table win-win survival strategies to ensure proactive domination. At the end of the day, going forward, a new normal that has evolved.",
         "age": "30",
         "email": "Sarah@digital.com",

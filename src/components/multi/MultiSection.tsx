@@ -5,7 +5,7 @@ import ProjectIdeaV1 from "../project/ProjectIdeaV1";
 import WhyChooseV1 from "../whyChoose/WhyChooseV1";
 
 const MultiSection = () => {
-    useHorizontalScroll();
+    useHorizontalScroll(80);
 
     return (
         <>
