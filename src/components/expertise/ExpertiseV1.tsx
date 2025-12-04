@@ -9,7 +9,7 @@ const ExpertiseV1 = () => {
                         <div className="col-lg-12">
                             <div className="site-heading">
                                 <h4 className="sub-title">Our Process </h4>
-                                <h2 className="title">Best Solutions Provider</h2>
+                                <h2 className="title">How We Transform Ideas into Results</h2>
                             </div>
                         </div>
                     </div>

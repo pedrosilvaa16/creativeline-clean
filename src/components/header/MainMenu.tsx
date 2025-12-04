@@ -62,7 +62,7 @@ export default function MainMenu({
         <Link href="/">Home</Link>
       </li>
       <li>
-        <Link href="/about">About</Link>
+        <Link href="/about-us">About</Link>
       </li>
       <li>
         <Link href="/services">Services</Link>
@@ -122,6 +122,9 @@ export default function MainMenu({
         </ul>
       </li>
 
+      <li>
+        <Link href="/blog">blog</Link>
+      </li>
       <li>
         <Link href="/contact">Contact</Link>
       </li>

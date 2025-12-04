@@ -36,25 +36,25 @@ const FooterV4 = ({ sectionClass }: DataType) => {
                                 </div>
                                 <ul className="address-list">
                                     <li>
-                                        <h4>Australia</h4>
+                                        <h4>U.S.A.</h4>
                                         <p>
-                                            Travel World House, Level 7, 17 Jones St, NSW, 2060
+                                            490 Post St, Ste 500 PMB 2269 San Francisco, CA 94102
                                         </p>
                                     </li>
                                     <li>
-                                        <h4>Dubai</h4>
+                                        <h4>Portugal</h4>
                                         <p>
-                                            Sheikh Mohammed bin salah, #234 B - Downtown - Dubai
+                                            Rua Eusébio da Silva Ferreira, 33C - loja 19 4630-463
                                         </p>
                                     </li>
                                 </ul>
                                 <div className="footer-contact">
                                     <ul>
                                         <li>
-                                            <a href="mailto:someone@example.com">info@dixor.com</a>
+                                            <a href="mailto:someone@example.com">geral@creativeline.studio</a>
                                         </li>
                                         <li>
-                                            <a href="tel:+4733378901">+47 333 78 901</a>
+                                            <a href="tel:+4733378901">+351 916 021 806</a>
                                         </li>
                                     </ul>
                                 </div>

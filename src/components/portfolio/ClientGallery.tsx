@@ -1,7 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
+
+import { useMemo } from "react";
 import Image from "next/image";
-import ModalVideo from "@/components/common/ModalVideo";
 
 type MediaItem = {
   mediaItemUrl?: string | null;
@@ -9,173 +9,251 @@ type MediaItem = {
   mediaDetails?: { width?: number | null; height?: number | null } | null;
 };
 
-type Card =
-  | { type: "image"; src: string; alt: string }
-  | { type: "video"; src: { type: "youtube" | "vimeo"; id: string }; poster?: string }
-  | { type: "file"; url: string; poster?: string };
+type Orientation = "landscape" | "portrait" | "square";
 
-function parseVideoCard(
-  v: { url: string | null; file: string | null },
-  fallbackPoster?: string
-): Card | null {
-  if (v.url) {
-    // YouTube
-    if (v.url.includes("youtube.com") || v.url.includes("youtu.be")) {
-      const id = v.url.includes("youtu.be")
-        ? (v.url.split("/").pop() || "").split("?")[0]
-        : new URL(v.url).searchParams.get("v") || "";
-      if (id) return { type: "video", src: { type: "youtube", id }, poster: fallbackPoster };
-    }
-    // Vimeo
-    if (v.url.includes("vimeo.com")) {
-      const id = v.url.split("/").filter(Boolean).pop() || "";
-      if (id) return { type: "video", src: { type: "vimeo", id }, poster: fallbackPoster };
-    }
-  }
-  // Ficheiro local
-  if (v.file) return { type: "file", url: v.file, poster: fallbackPoster };
-  return null;
+type BaseCard = {
+  orientation: Orientation;
+};
+
+type ImageCard = {
+  type: "image";
+  src: string;
+  alt: string;
+} & BaseCard;
+
+type VideoCard = {
+  type: "video";
+  url: string;
+} & BaseCard;
+
+type Card = ImageCard | VideoCard;
+
+function getOrientationFromMedia(m: MediaItem): Orientation {
+  const w = m.mediaDetails?.width ?? 0;
+  const h = m.mediaDetails?.height ?? 0;
+
+  if (!w || !h) return "landscape";
+
+  if (w === h) return "square";
+  if (w > h) return "landscape";
+  return "portrait";
 }
 
 export default function ClientGallery({
   images,
   videos,
-  fallbackPoster,
 }: {
   images: MediaItem[];
   videos: { url: string | null; file: string | null }[];
-  fallbackPoster?: string;
 }) {
-  const [open, setOpen] = useState<{ type: "youtube" | "vimeo"; id: string } | null>(null);
-
   const cards: Card[] = useMemo(() => {
+    const isImageUrl = (url: string) =>
+      /\.(jpe?g|jpeg|png|webp|gif|avif)$/i.test(url);
+
+    const isVideoUrl = (url: string) =>
+      /\.(mp4|mov|m4v|webm|ogg)$/i.test(url);
+
+    // 1) Itens vindos da galeria de imagens do WP
     const imgCards: Card[] = images
-      .map((m, i) =>
-        m?.mediaItemUrl
-          ? ({
-              type: "image",
-              src: m.mediaItemUrl,
-              alt: m.altText || `Gallery image ${i + 1}`,
-            } as const)
-          : null
-      )
+      .map((m, i) => {
+        if (!m?.mediaItemUrl) return null;
+
+        const url = m.mediaItemUrl;
+
+        if (isImageUrl(url)) {
+          return {
+            type: "image",
+            src: url,
+            alt: m.altText || `Gallery image ${i + 1}`,
+            orientation: getOrientationFromMedia(m),
+          } as ImageCard;
+        }
+
+        if (isVideoUrl(url)) {
+          return {
+            type: "video",
+            url,
+            orientation: getOrientationFromMedia(m),
+          } as VideoCard;
+        }
+
+        return null;
+      })
       .filter(Boolean) as Card[];
 
+    // 2) Itens vindos do campo de vídeos (também do WP)
     const vidCards: Card[] = videos
-      .map((v) => parseVideoCard(v, fallbackPoster))
+      .map((v) => {
+        const url = v.file || v.url;
+        if (!url) return null;
+        if (!isVideoUrl(url)) return null;
+
+        // aqui assumimos landscape por defeito; se precisares, podes
+        // passar dimensões também neste objecto e usar uma função semelhante
+        return {
+          type: "video",
+          url,
+          orientation: "landscape",
+        } as VideoCard;
+      })
       .filter(Boolean) as Card[];
 
     return [...imgCards, ...vidCards];
-  }, [images, videos, fallbackPoster]);
+  }, [images, videos]);
+
+  const rows = useMemo(() => {
+    type Row = { layout: "full" | "two"; items: Card[] };
+
+    const result: Row[] = [];
+
+    const isVerticalish = (c: Card) =>
+      c.orientation === "square" || c.orientation === "portrait";
+
+    let i = 0;
+    while (i < cards.length) {
+      const current = cards[i];
+      const next = cards[i + 1];
+
+      // Duas peças quadradas/verticais seguidas → bloco de 2 colunas
+      if (isVerticalish(current) && next && isVerticalish(next)) {
+        result.push({ layout: "two", items: [current, next] });
+        i += 2;
+        continue;
+      }
+
+      // Caso contrário → full-width
+      result.push({ layout: "full", items: [current] });
+      i += 1;
+    }
+
+    return result;
+  }, [cards]);
 
   return (
     <section className="project-details-items default-padding">
       <div className="container">
-        <div className="masonry">
-          {cards.map((c, idx) => {
-            if (c.type === "image") {
-              return (
-                <figure key={idx} className="masonry-item">
-                  <Image
-                    src={c.src}
-                    alt={c.alt}
-                    width={900}
-                    height={900}
-                    className="w-100 h-auto object-cover"
-                  />
-                </figure>
-              );
-            }
-
-            if (c.type === "video") {
-              return (
-                <div key={idx} className="masonry-item">
-                  <button
-                    type="button"
-                    className="video-card w-100 rounded overflow-hidden shadow-sm position-relative"
-                    onClick={() => setOpen(c.src)}
-                    aria-label="Play video"
-                  >
-                    {c.poster ? (
+        <div className="gallery-rows">
+          {rows.map((row, rowIndex) => (
+            <div
+              key={rowIndex}
+              className={`gallery-row gallery-row--${row.layout}`}
+            >
+              {row.items.map((c, idx) => {
+                if (c.type === "image") {
+                  return (
+                    <figure key={idx} className="gallery-item">
                       <Image
-                        src={c.poster}
-                        alt="Video cover"
+                        src={c.src}
+                        alt={c.alt}
                         width={900}
                         height={900}
                         className="w-100 h-auto object-cover"
                       />
-                    ) : (
-                      <div style={{ aspectRatio: "16/9" }} />
-                    )}
-                    <span className="play-badge" aria-hidden>
-                      ▶
-                    </span>
-                  </button>
-                </div>
-              );
-            }
+                    </figure>
+                  );
+                }
 
-            // c.type === "file"
-            return (
-              <div key={idx} className="masonry-item">
-                <a
-                  className="video-card w-100 rounded overflow-hidden shadow-sm position-relative"
-                  href={c.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Open video file"
-                >
-                  {c.poster ? (
-                    <Image
-                      src={c.poster}
-                      alt="Video file cover"
-                      width={900}
-                      height={900}
-                      className="w-100 h-auto object-cover"
+                // c.type === "video"
+                return (
+                  <div key={idx} className="gallery-item">
+                    <video
+                      src={c.url}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className={`media-video media-video--${c.orientation}`}
                     />
-                  ) : (
-                    <div style={{ aspectRatio: "16/9" }} />
-                  )}
-                  <span className="play-badge" aria-hidden>
-                    ▶
-                  </span>
-                </a>
-              </div>
-            );
-          })}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Modal para YouTube/Vimeo */}
-      {open && (
-        <ModalVideo
-          isOpen={true}
-          onClose={() => setOpen(null)}
-          channel={open.type}
-          videoId={open.id}
-          title="Gallery video"
-        />
-      )}
-
       <style jsx>{`
-        .video-card { cursor: pointer; }
-        .video-card .play-badge {
-          position: absolute; inset: 0; display: grid; place-items: center;
-          font-size: 42px; color: white; text-shadow: 0 2px 10px rgba(0,0,0,.6);
+        /* Rebenta a .container para a galeria ocupar a largura total */
+        :global(.project-details-items .container) {
+          max-width: none;
+          padding-left: 0;
+          padding-right: 0;
         }
-        .video-card:hover .play-badge { transform: scale(1.08); }
-        .masonry { column-width: 22rem; column-gap: 1.5rem; }
-        @media (max-width: 575.98px) { .masonry { column-width: 18rem; } }
-        .masonry-item {
-          break-inside: avoid; -webkit-column-break-inside: avoid;
-          margin: 0 0 1.5rem; display: block;
+
+        .gallery-rows {
+          display: flex;
+          flex-direction: column;
+          gap: 3.5rem;
+          width: 100%;
         }
-        .masonry-item > :global(img),
-        .masonry-item .video-card {
-          width: 100%; height: auto; display: block;
-          border-radius: 0.5rem; overflow: hidden;
+
+        .gallery-row {
+          width: 100%;
+        }
+
+        .gallery-row--full {
+          display: block;
+        }
+
+        .gallery-row--full .gallery-item {
+          width: 100%;
+        }
+
+        .gallery-row--two {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1.75rem;
+          align-items: stretch;
+        }
+
+        .gallery-item {
+          position: relative;
+          width: 100%;
+        }
+
+        /* Imagens e vídeos: base visual */
+        .gallery-item :global(img),
+        .media-video {
+          width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 1.5rem;
+          object-fit: cover;
+          overflow: hidden;
+        }
+
+        /* IMAGENS */
+        .gallery-item :global(img) {
+          object-fit: cover;
+        }
+
+        /* VÍDEOS – proporção dinâmica */
+        .media-video--landscape {
+          aspect-ratio: 16 / 9;
+        }
+
+        .media-video--square {
+          aspect-ratio: 1 / 1;
+        }
+
+        @media (max-width: 1024px) {
+          .gallery-rows {
+            gap: 3rem;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .gallery-row--two {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+
+          .gallery-rows {
+            gap: 2.25rem;
+          }
         }
       `}</style>
+
     </section>
   );
 }

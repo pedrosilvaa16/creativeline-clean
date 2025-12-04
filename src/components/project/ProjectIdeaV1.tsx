@@ -1,7 +1,7 @@
 const ProjectIdeaV1 = () => {
     return (
-        <>
-            <div className="contact-panel-bg" style={{ backgroundImage: 'url(/assets/img/about/3.jpg)' }} />
+        <> 
+            <div className="contact-panel-bg" style={{ backgroundImage: 'url(/assets/img/about/creative-line-studio-session.webp)' }} />
             <div className="container">
                 <div className="row">
                     <div className="col-lg-7">
@@ -14,7 +14,7 @@ const ProjectIdeaV1 = () => {
                                 </div>
                                 <div className="info">
                                     <h4>Phone</h4>
-                                    <a className="phone-link" href="tel:+4733378901">+4733378901</a> <br />
+                                    <a className="phone-link" href="tel:+351913747623">+351 916 021 806</a> <br />
                                 </div>
                             </li>
                             <li>
@@ -23,7 +23,7 @@ const ProjectIdeaV1 = () => {
                                 </div>
                                 <div className="info">
                                     <h4>Official Email</h4>
-                                    <a href="mailto:info@agrul.com.com">info@agrul.com</a>
+                                    <a href="mailto:geral@creativeline.studio">geral@creativeline.studio</a>
                                 </div>
                             </li>
                         </ul>
