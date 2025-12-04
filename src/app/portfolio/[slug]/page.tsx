@@ -291,7 +291,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <ClientGallery
           images={galleryImages}
           videos={videos}
-          fallbackPoster={f.poster?.node?.mediaItemUrl || undefined}
         />
       )}
 
